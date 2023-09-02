@@ -15,7 +15,6 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify(data));
     });
-    // curl -X POST -d "key1=value1&key2=value2" http://localhost:3000
   } else if (contentType === "application/x-www-form-urlencoded") {
     // curl -X POST -d "key1=value1&key2=value2" http://localhost:3000
     handleRawStream(req, (buffer) => {
@@ -25,12 +24,17 @@ const server = http.createServer((req, res) => {
       res.end("hello");
     });
   } else if (contentType.startsWith('multipart/form-data')) {
-    // .startsWith('multipart/form-data')
-    // curl -X POST -F "file=@/path/to/your/file.txt" http://localhost:3000
-    let body = Buffer.alloc(0);
+    // curl  -X POST \
+    //       -F "name=zhangsan" \
+    //       -F "age=18" \
+    //       -F "raw=@a.json" \
+    //       http://localhost:3000
+    let body = [];
+    // let body = Buffer.alloc(0);
 
     req.on("data", (chunk) => {
-      body = Buffer.concat([body, chunk]);
+      // body = Buffer.concat([body, chunk]);
+      body.push(chunk);
     });
 
     req.on("end", () => {
@@ -40,7 +44,7 @@ const server = http.createServer((req, res) => {
         .replace("boundary=", "")}`;
         // 解析请求体，分割成多个部分（parts），每个部分代表一个字段或文件。这里采用的分隔符是请求头中的 boundary 值。
         const parts = body.toString().split(boundary);
-        // 循环处理每个部分。对于包含文件的部分，解析出文件名和文件数据，并将文件数据保存到服务器上的 uploads 目录中。对于包含表单字段的部分，解析出字段名和字段数据并进行日志记录。
+        // 循环处理每个部分
         for (const part of parts) {
           if (part.includes('filename=')) {
             // 如果 part 包含 'filename='，则为文件
