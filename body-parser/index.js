@@ -1,5 +1,5 @@
 const http = require("http");
-const handleRawStream = require("./main");
+const handleRawStream = require("./handleRawStream");
 const querystring = require("querystring");
 const path = require("path");
 const fs = require("fs");
@@ -19,7 +19,7 @@ const server = http.createServer((req, res) => {
     // curl -X POST -d "key1=value1&key2=value2" http://localhost:3000
     handleRawStream(req, (buffer) => {
       res.writeHead(200, { "Content-Type": "application/json" });
-      let x = querystring.parse(buffer.toString());
+      let x = querystring.parse(buffer.toString('utf-8'));//将buffer转换成字符串，
       console.log("querystring.parse(buf :>> ", x);
       res.end("hello");
     });
